@@ -83,14 +83,9 @@ FATE (Federated AI Technology Enabler),微众银行AI部门发起的开源项目
       "file": "${path to csv file}",
       "id_delimiter":",",
       "head": 1,
-      // 忽略header: 0
-      // 读取header: 1
       "partition": 4,
       "work_mode": 0,
-      // 单机部署模式: 0 
-      // 集群部署模式: 1
-      "backend":0,
-      // ????
+      "backend": 0,
       "namespace": "${namespace}",
       "table_name": "${table_name}"
     }
