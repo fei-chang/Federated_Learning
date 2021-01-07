@@ -10,13 +10,14 @@ FATE (Federated AI Technology Enabler),微众银行AI部门发起的开源项目
   - [在线部分](#在线部分)
 - [部署](#部署)
   - [单机部署](#单机部署)
-- [运行测试](#运行测试)
+- [实际应用测试](#实际应用测试)
+  - [调取Intersect模块](#调取Intersect模块)
 
 ## 待完成内容
 
 目前待回答问题、待完成内容有：
 
-1. 是否可以直接生成dsl与conf配置文档？
+1. 是否可以直接生成dsl与conf配置文档？- 尤其对应Intersect模块生成可直接运行的pipe
 2. 如何获取模型的evaluation metric？
 3. 安全算法
 
@@ -83,14 +84,9 @@ FATE (Federated AI Technology Enabler),微众银行AI部门发起的开源项目
       "file": "${path to csv file}",
       "id_delimiter":",",
       "head": 1,
-      // 忽略header: 0
-      // 读取header: 1
       "partition": 4,
       "work_mode": 0,
-      // 单机部署模式: 0 
-      // 集群部署模式: 1
       "backend":0,
-      // ????
       "namespace": "${namespace}",
       "table_name": "${table_name}"
     }
@@ -365,3 +361,126 @@ FATE (Federated AI Technology Enabler),微众银行AI部门发起的开源项目
 
 4. 测试并输出测试结果
     **待续**
+
+## 实际应用测试
+
+### 调取Intersect 模块
+
+1. 上传数据（如部署内容中所示）
+2. 添加dsl与conf配置文件
+
+    ```json
+    {
+        "components" : {
+            "dataio_0": {
+                "module": "DataIO",
+                "input": {
+                    "data": {
+                        "data": [
+                            "args.data"
+                        ]
+                    }
+                },
+                "output": {
+                    "data": ["data"]
+                },
+                "need_deploy": false
+            },
+            "intersect_0": {
+                "module": "Intersection",
+                "input": {
+                    "data": {
+                        "data": [
+                            "dataio_0.data"
+                        ]
+                    }
+                },
+                "output": {
+                    "data": ["intersect_data"]
+                }
+            }
+        }
+    }
+    ```
+
+    ```json
+    {
+    "initiator": {
+        "role": "guest",
+        "party_id": 10000
+    },
+    "job_parameters": {
+        "work_mode": 0
+    },
+    "role": {
+        "guest": [
+            10000
+        ],
+        "host": [
+            10000
+        ]
+    },
+    "role_parameters": {
+        "guest": {
+            "args": {
+                "data": {
+                    "data": [
+                        {
+                            "name": "client_id",
+                            "namespace": "experiment"
+                        }
+                    ]
+                }
+            },
+            "dataio_0": {
+                "with_label": [
+                    false
+                ],
+                "output_format": [
+                    "dense"
+                ]
+            }
+        },
+        "host": {
+            "args": {
+                "data": {
+                    "data": [
+                        {
+                            "name": "server_id",
+                            "namespace": "experiment"
+                        }
+                    ]
+                }
+            },
+            "dataio_0": {
+                "with_label": [
+                    false
+                ],
+                "output_format": [
+                    "dense"
+                ]
+            }
+        }
+    },
+    "algorithm_parameters": {
+        "intersect_0": {
+            "intersect_method": "rsa",
+            "sync_intersect_ids": true,
+            "only_output_key": true
+            }
+        }
+    }
+    ```
+
+3. 提交工作请求并等待结果：
+
+    ```bash
+        python ${fate_install_path}/fate_flow/fate_flow_client.py -f submit_job -c ${runtime_config} -d ${dsl}
+    ```
+
+4. 读取结果并下载输出数据集：
+
+    ```bash
+        python ${fate_install_path}/fate_flow/fate_flow_client.py  -f component_output_data -j ${Job_id} -p ${party_id} -cpn ${component_name} -o ${target_directory_path} -r ${role}
+
+    ```
