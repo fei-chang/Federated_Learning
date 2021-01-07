@@ -1,4 +1,5 @@
 
+该文档为联邦学习综述性学习内容整理
 # 联邦学习
 
 - [待完成内容](#待完成内容)
@@ -96,7 +97,9 @@
 
 - [FATE](https://github.com/FederatedAI/FATE) 
 
-> 适用于横向、纵向、以及迁移联邦学习的开源项目，使用基于同态加密算法与秘密共享的安全协议。**支持联邦特征工程算法（待读）**
+> 适用于横向、纵向、以及迁移联邦学习的开源项目，使用基于同态加密算法与秘密共享的安全协议。
+>
+> 具体更多内容可参考[FATE部署学习记录](https://github.com/fei-chang/Federated_Learning/blob/main/FATE_standalone.md)
 
 - [Asylo](https://github.com/google/asylo) Google开发，需在TEE中执行。**待查**
 
